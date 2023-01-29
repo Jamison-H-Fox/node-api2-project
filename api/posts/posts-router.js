@@ -79,7 +79,35 @@ router.post('/', (req, res) => {
 })
 
 // *** PUT *** //
-
+router.put('/:id', (req,res) => {
+    const { id } = req.params;
+    const changes = req.body;
+    if(!changes.title || !changes.contents){ // if the req body is missing title or contents
+        res.status(400).json({
+            message: "Please provide title and contents for the post"
+        })
+    } else {  // if the req body has necessary data
+        Post.update(id, changes)
+            .then(post => {
+                if(post){ // if the Post.update returns a valid id
+                    res.status(200).json({
+                        id: post,
+                        title: changes.title,
+                        contents: changes.contents,
+                    });
+                } else { // if the Post.update returns an invalid id
+                    res.status(404).json({
+                        message: "The post with the specified ID does not exist"
+                    })
+                }
+            })
+            .catch(err => { // if there is an error updating post
+                res.status(500).json({
+                    message: "The post information could not be modified"
+                })
+            })
+    }
+})
 
 // *** DELETE *** //
 
